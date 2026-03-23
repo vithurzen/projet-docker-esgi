@@ -28,7 +28,7 @@ services:
       - NODE_ENV=production
       - PORT=3001
       - MONGO_URI=mongodb://mongo-auth:27017/authdb
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=efrei_super_pass
     networks:
       - ecommerce-overlay
     deploy:
@@ -41,6 +41,8 @@ services:
       context: ./services/product-service
       target: prod
     image: ecommerce/product-service:latest
+    ports:
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -61,6 +63,7 @@ services:
       - NODE_ENV=production
       - PORT=3002
       - MONGO_URI=mongodb://mongo-order:27017/orderdb
+      - JWT_SECRET=efrei_super_pass
     networks:
       - ecommerce-overlay
     deploy:
@@ -95,6 +98,29 @@ services:
     deploy:
       replicas: 1
 
+  init-products:
+    image: curlimages/curl:latest
+    depends_on:
+      - product-service
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        sleep 60 &&
+        curl -X POST http://product-service:3000/api/products -H 'Content-Type: application/json' -d '{"name":"Smartphone Galaxy S21","price":899,"description":"Dernier smartphone Samsung avec appareil photo 108MP","stock":15}' &&
+        curl -X POST http://product-service:3000/api/products -H 'Content-Type: application/json' -d '{"name":"MacBook Pro M1","price":1299,"description":"Ordinateur portable Apple avec puce M1","stock":10}' &&
+        curl -X POST http://product-service:3000/api/products -H 'Content-Type: application/json' -d '{"name":"PS5","price":499,"description":"Console de jeu dernière génération","stock":5}' &&
+        curl -X POST http://product-service:3000/api/products -H 'Content-Type: application/json' -d '{"name":"Écouteurs AirPods Pro","price":249,"description":"Écouteurs sans fil avec réduction de bruit","stock":20}' &&
+        curl -X POST http://product-service:3000/api/products -H 'Content-Type: application/json' -d '{"name":"Nintendo Switch","price":299,"description":"Console de jeu portable","stock":12}' &&
+        curl -X POST http://product-service:3000/api/products -H 'Content-Type: application/json' -d '{"name":"iPad Air","price":599,"description":"Tablette Apple avec écran Retina","stock":8}' &&
+        curl -X POST http://product-service:3000/api/products -H 'Content-Type: application/json' -d '{"name":"Montre connectée","price":199,"description":"Montre intelligente avec suivi d'"'"'activité","stock":25}' &&
+        curl -X POST http://product-service:3000/api/products -H 'Content-Type: application/json' -d '{"name":"Enceinte Bluetooth","price":79,"description":"Enceinte portable waterproof","stock":30}' || true
+    networks:
+      - ecommerce-overlay
+    deploy:
+      restart_policy:
+        condition: none
+
 volumes:
   mongo-auth-data:
   mongo-product-data:
@@ -103,3 +129,4 @@ volumes:
 networks:
   ecommerce-overlay:
     driver: overlay
+    attachable: true

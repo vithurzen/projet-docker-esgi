@@ -5,7 +5,7 @@ WORKDIR /app
 # Installation des dépendances
 FROM base AS deps
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Environnement de développement
 FROM deps AS dev
@@ -17,7 +17,7 @@ CMD ["npm", "run", "dev"]
 # Dépendances de production
 FROM base AS prod-deps
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force
 
 # Image de production finale
 FROM base AS prod

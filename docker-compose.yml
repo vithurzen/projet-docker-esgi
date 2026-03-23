@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: frontend
     ports:
-      - "5173:5173"
+      - "8080:8080"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -34,7 +34,7 @@ services:
       - NODE_ENV=development
       - PORT=3001
       - MONGO_URI=mongodb://mongo-auth:27017/authdb
-      - JWT_SECRET=change_me
+      - JWT_SECRET=efrei_super_pass
     depends_on:
       - mongo-auth
     networks:
@@ -73,8 +73,11 @@ services:
       - NODE_ENV=development
       - PORT=3002
       - MONGO_URI=mongodb://mongo-order:27017/orderdb
+      - JWT_SECRET=efrei_super_pass
+      - PRODUCT_SERVICE_URL=http://product-service:3000
     depends_on:
       - mongo-order
+      - product-service
     networks:
       - ecommerce-network
 
